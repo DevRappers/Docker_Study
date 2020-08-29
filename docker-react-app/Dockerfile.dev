@@ -1,0 +1,14 @@
+FROM node:alpine
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY ./ ./
+
+CMD ["npm","run","start"]
+
+## Dockerfile을 만들지 않고 빌드를 돌릴때에는 Docker build -f Dockerfile.dev ./를 입력.
+## docker run -it -p 3000:3000 -v /usr/src/app/node_modules -v $(pwd):/usr/src/app devrappers/docker-react-app

@@ -1,2 +1,3 @@
 .idea
 nodejs-docker-app/node_modules
+docker-react-app/node_modules
