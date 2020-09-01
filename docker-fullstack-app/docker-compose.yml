@@ -1,0 +1,40 @@
+version: "3"
+services:
+  frontend:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./frontend
+    volumes:
+    - /app/node_modules     # workdir이 app이기 때문에 /app
+    - ./frontend:/app
+    stdin_open: true
+
+  nginx:
+    restart: always         # 재시작 정책 : 서버가 켜지다가 갑작스럽게 꺼질때 어떻게 재시작을 할지 정의 no, always, on-failure, unless-stopped 옵션이 있음.
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    ports:
+    - "3000:80"
+
+  backend:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./backend
+    container_name: app_backend
+    volumes:
+    - /app/node_modules
+    - ./backend:/app
+
+  mysql:
+    build: ./mysql
+    restart: unless-stopped   # 개발자가 임의로 멈추려고 할 때 빼고는 항상 재시작.
+    container_name: app_mysql
+    ports:
+    - "3306:3306"
+    volumes:    # 영속성이 필요한 데이터 처리/볼륨이란 도커 컨테이너에 의해 생성되고 사용되는 지속적인 데이터를 위한 선호 매커니즘이다.
+    - ./mysql/mysql_data:/var/lib/mysql
+    - ./mysql/sqls/:/docker-entrypoint-initdb.d/
+    environment:
+      MYSQL_ROOT_PASSWORD: pnp#1004!
+      MYSQL_DATABASE: myapp
